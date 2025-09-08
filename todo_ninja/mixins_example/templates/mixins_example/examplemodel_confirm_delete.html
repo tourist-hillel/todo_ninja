@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html>
+    <strong>{{ object.name }}</strong>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Confirm</button>
+    </form>
+</html>

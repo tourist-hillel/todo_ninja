@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: sh -c "python manage.py makemigrations && python manage.py migrate && uvicorn todo_ninja.asgi:application  --host 0.0.0.0 --port 8000"
+    volumes:
+      - ./todo_ninja:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULTS_BACKEND=redis://redis:6379/0
+    restart: always
+  
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      - POSTGRES_DB=second_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+  
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - "6379:6379"
+
+  celery-worker:
+    build: .
+    command: celery -A todo_ninja worker -l info
+    volumes:
+      - ./todo_ninja:/app
+    depends_on:
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULTS_BACKEND=redis://redis:6379/0
+    restart: always
+
+  celery-beat:
+    build: .
+    command: celery -A todo_ninja beat -l info
+    volumes:
+      - ./todo_ninja:/app
+    depends_on:
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULTS_BACKEND=redis://redis:6379/0
+    restart: always
+
+  minio:
+    image: minio/minio
+    container_name: minio_todo
+    restart: always
+    ports:
+      - "9000:9000"
+    environment:
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    volumes:
+      - ./data:/data
+    command: server /data

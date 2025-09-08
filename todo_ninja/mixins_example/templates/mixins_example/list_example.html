@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+    <ul>
+        {% for example in examples %}
+            <li>{{ example.name }}</li>
+        {% empty %}
+            <span>No examples</span>
+        {% endfor %}
+    </ul>
+</html>

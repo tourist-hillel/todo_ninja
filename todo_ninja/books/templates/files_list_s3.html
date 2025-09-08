@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="file">
+        <button type="submit" formaction="{% url 'upload_file_s3' %}">Upload</button>
+    </form>
+</html>

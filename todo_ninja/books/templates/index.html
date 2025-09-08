@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="uk">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Обробка файлів</title>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    </head>
+    <body>
+        <h1>Test from local space</h1>
+
+        <h2>Завантажити файл</h2>
+        <input type="file" id="fileInput" accept=".txt">
+        <button onclick="uploadFile()">Завантажити</button>
+        <div id="result"></div>
+
+        <h2>Список файлів</h2>
+        <button onclick="listFiles()">Оновити список</button>
+        <div id="fileList"></div>
+
+        <h2>Вміст файлу</h2>
+        <div id="fileContent"></div>
+
+        {% csrf_token %}
+        <script>
+            function uploadFile() {
+                const fileInput = $('#fileInput')[0];
+                if (!fileInput.files.length) {
+                    $('#result').html(`<p class="error">Будь ласка, виберіть файл!</p>`).fadeIn();
+                }
+
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                file = fileInput.files[0];
+
+                $.ajax({
+                    url: '/files_cbv/',
+                    type: 'POST',
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    headers: {
+                            'X-CSRFToken': getCsrfToken()
+                    },
+                    success: function(response) {
+                        if (response.error) {
+                            $('#result').html(`<p class="error">Помилка: ${response.error}</p>`).fadeIn();
+                        } else {
+                            $('#result').html(`
+                                <p class="success">Файл: ${response.filename}</p>
+                                <p>Кількість слів: ${response.word_count}</p>
+                                <p>Кількість символів: ${response.char_count}</p>
+                                <p>Завантажено: ${response.upladed_at}</p>
+                                <p><a href="${response.file_url}" download>Завантажити</a></p>
+                            `).fadeIn();
+                            listFiles();
+                        }
+                    },
+                    error: function() {
+                        $('#result').html(`<p class="error">Помилка серверу!</p>`).fadeIn();
+                    }
+                });
+            }
+
+            function listFiles() {
+                $.ajax({
+                    url: '/files_cbv/',
+                    type: 'GET',
+                    success: function(response) {
+                        if (response.redis_files.length === 0) {
+                            $('#fileList').html(`<p>Немає файлів</p>`).fadeIn();
+                        } else {
+                            let filesHtml = '<ul>';
+                            response.redis_files.forEach(file => {
+                                filesHtml += `
+                                    <li>
+                                        ${file}
+                                `
+                            });
+                            filesHtml += '</ul>';
+                            $('#fileList').html(filesHtml);
+                        }
+                    },
+                    error: function () {
+                        $('#fileList').html(`<p class="error">Помилка серверу!</p>`).fadeIn();
+                    }
+                })
+            }
+
+            function viewFile(fileId) {
+                $.ajax({
+                    url: `/file_cbv/${fileId}/`,
+                    type: 'GET',
+                    success: function(response) {
+                        if (response.error) {
+                            $('#fileContent').html(`<p class="error">Помилка: ${response.error}</p>`).fadeIn();
+                        } else {
+                            $('#fileContent').html(`
+                                <p class="success">Файл: ${response.filename}</p>
+                                <p>Кількість слів: ${response.word_count}</p>
+                                <p>Кількість символів: ${response.char_count}</p>
+                                <p>Завантажено: ${response.upladed_at}</p>
+                                <p><a href="${response.file_url}" download>Завантажити</a></p>
+                            `).fadeIn();
+                        }
+                    },
+                    error: function() {
+                        $('#fileContent').html(`<p class="error">Помилка серверу!</p>`).fadeIn();
+                    }
+                })
+            }
+
+            function deleteFile(fileId) {
+                if (confirm('Ви впевнені що хочете видалити файл?')) {
+                    $.ajax({
+                        url: `/file_cbv/${fileId}/`,
+                        type: 'DELETE',
+                        headers: {
+                            'X-CSRFToken': getCsrfToken()
+                        },
+                        success: function(response) {
+                            if (response.error) {
+                                $('#result').html(`<p class="error">Помилка: ${response.error}</p>`).fadeIn();
+                            } else {
+                                $('#result').html(`<p>${response.message}</p>`).fadeIn();
+                                listFiles();
+                                $('#fileContent').fadeOut();
+                            }
+                        },
+                        error: function() {
+                            $('#result').html(`<p class="error">Помилка серверу при видаленні!</p>`).fadeIn();
+                        }
+                    })
+                }
+            }
+
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            function getCsrfToken() {
+                return $('input[name="csrfmiddlewaretoken"]').val();
+            }
+
+            $(document).ready(() => {
+                listFiles();
+            });
+
+            // $(document).ready(function() {
+            //     listFiles();
+            // })
+        </script>
+    </body>
+</html>

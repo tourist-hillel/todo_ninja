@@ -1,0 +1,13 @@
+{% extends "admin/change_form.html" %}
+{% block extrastyle %}
+    <style>
+        .form-row { background-color:darkslategrey; padding: 10px;}
+    </style>
+{% endblock %}
+{% block extrahead %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            alert('Welcome to the Book Edit Form');
+        });
+    </script>
+{% endblock %}

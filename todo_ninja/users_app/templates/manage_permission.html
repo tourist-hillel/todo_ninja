@@ -1,0 +1,25 @@
+<h2>Керування дозволами користувачів</h2>
+
+<div>
+    <form method="get">
+        <label for="user_id">Оберіть користувача</label>
+        <select name="user_id" id="user_id" onchange="this.form.submit()">
+            <option value="">-- Оберіть користувача --</option>
+            {% for user in users %}
+                <option value="{{ user.id }}" {% if user == selected_user %}selected{% endif %}>
+                    {{ user.email }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+
+    {% if selected_user %}
+        <h3>Дозволи для {{ selected_user.email }}</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="user_id" value="{{ selected_user.id }}">
+            {{ form.permissions }}
+            <button type="submit">Зберегти зміни</button>
+        </form>
+    {% endif %}
+</div>

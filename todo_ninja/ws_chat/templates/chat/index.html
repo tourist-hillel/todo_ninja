@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chat Room - {{ room_name }}</title>
+    </head>
+    <body>
+        {% if user.is_authenticated %}
+            <h1>Room: {{ room_name }}, User: {{ user.email }}</h1>
+            <div id="chat-messages"></div>
+            <input type="text" id="chat-message-input" placeholder="Type a message">
+            <button onclick="sendMessage()">Send</button>
+        {% else %}
+            <p>Please <a href="{% url 'login' %}>">Log in to the chat</a></p>
+        {% endif %}
+        <script>
+            const roomName = "{{ room_name }}";
+            const chatSocket = new WebSocket(
+                (window.location.protocol === 'https:'? 'wss://': 'ws://') +
+                 window.location.host + '/ws/chat/' + roomName + '/'
+            );
+            chatSocket.onopen = () => console.log('Connected to WebSocket');
+            chatSocket.onmessage = function(e) {
+                const data = JSON.parse(e.data);
+                const messageElement = document.createElement('div');
+                messageElement.innerHTML = `<strong>${data.username}</strong> : ${data.message}`;
+                document.getElementById('chat-messages').appendChild(messageElement);
+            };
+            chatSocket.onclose = (e) => {
+                if (e.code === 4001) {
+                    alert('Connection limit exceeded');
+                }
+                console.error('Websocket closed:', e);
+            };
+
+            function sendMessage() {
+                const messageInput = document.getElementById('chat-message-input');
+                const message = messageInput.value;
+                chatSocket.send(JSON.stringify({
+                    'message': message
+                }));
+                messageInput.value = '';
+            }
+        </script>
+    </body>
+</html>

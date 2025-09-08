@@ -1,0 +1,12 @@
+.field-title {
+    color:aquamarine !important;
+    font-size: 16px;
+}
+
+.form-row {
+    border: 1px solid #ddd
+}
+
+.field-cover_image_preview {
+    margin-top: 10px;
+}
