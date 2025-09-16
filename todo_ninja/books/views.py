@@ -19,7 +19,7 @@ def upload_file(request):
     if request.method == 'POST' and request.FILES.get('file'):
         file = request.FILES['file']
         if not file.name.endswith('.txt'):
-            return JsonResponse({'error': 'Invalid file type, only .txt allowed'}, status=400)
+            return JsonResponse({'error': 'Invalid file type, only .txt is allowed'}, status=400)
         try:
             content = file.read().decode('utf-8')
             word_count = len(content.split())
@@ -54,6 +54,7 @@ def upload_file(request):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse({'error': 'No file provided'}, status=400)
+
 
 def list_files(request):
     redis_client = RedisClient()
@@ -134,6 +135,7 @@ class ListFilesUploadView(View):
                     {'id':uploaded_file.pk, 'filename': file.name, 'file_url': uploaded_file.file.url},
                     expire=40
                 )
+
                 file_word_count.send(
                     sender=UploadedFiles,
                     instance=uploaded_file,
@@ -177,15 +179,7 @@ class FileDetailView(View):
             return JsonResponse({'message': 'File deleted successfully'})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
-        
-# class DeleteFileView(View):
-#     def delete(self, request, file_id):
-#         uploaded_file = get_object_or_404(UploadedFiles, id=file_id)
-#         try:
-#             uploaded_file.delete()
-#             return JsonResponse({'message': 'File deleted successfully'})
-#         except Exception as e:
-#             return JsonResponse({'error': str(e)}, status=500)
+
 
 def upload_files_s3(request):
     if request.method == 'POST' and request.FILES['file']:
