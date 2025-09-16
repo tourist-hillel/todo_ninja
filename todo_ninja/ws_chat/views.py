@@ -17,8 +17,6 @@ def register(request):
             user = form.save()
             login(request, user)
             messages.success(request, 'Registration Successfull!!!')
-
-            
             return redirect('chat', room_name='start-room')
         else:
             for field, errors in form.errors.items():
