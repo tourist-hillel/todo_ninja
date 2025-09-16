@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-s5$c#h61h&o5#hgv!)878f#u+hs5%-xpy8o-m+6whd%l0!k9y2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -54,6 +54,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -66,7 +67,7 @@ ROOT_URLCONF = 'todo_ninja.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -87,14 +88,14 @@ ASGI_APPLICATION = 'todo_ninja.asgi.application'
 
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': ':memory:',
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'second_db',
-        'USER': 'postgres',
-        'PASSWORD': 'password',
-        'HOST': 'db',
-        'PORT': '5432'
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'ENGINE': 'django.db.backends.postgresql',
+        # 'NAME': 'second_db',
+        # 'USER': 'postgres',
+        # 'PASSWORD': 'password',
+        # 'HOST': 'db',
+        # 'PORT': '5432'
     }
 }
 
@@ -121,13 +122,21 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
 
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
+USE_L10N = True
+
 USE_TZ = True
+
+LANGUAGES = [
+    ('en', 'English'),
+    ('uk', 'Українська')
+]
+
 
 
 # Static files (CSS, JavaScript, Images)
@@ -137,7 +146,11 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'books/static'
 ]
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR / 'static'
+
+LOCALE_PATHS = [
+    BASE_DIR / 'locale/'
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -208,8 +221,8 @@ CSRF_TRUSTED_ORIGINS = [
 AWS_ACCESS_KEY_ID = 'minioadmin'
 AWS_SECRET_KEY = 'minioadmin'
 AWS_STORAGE_BUCKET_NAME = 'my-bucket'
-AWS_S3_ENDPOINT_URL = 'http://192.168.97.2:9000'
-AWS_S3_FILE_OVERWRITE = False
+AWS_S3_ENDPOINT_URL = 'http://192.168.97.4:9000'
+AWS_S3_FILE_OVERWRITE = True
 
 
 STORAGES = {
@@ -223,6 +236,8 @@ STORAGES = {
         }
     },
     'staticfiles': {
-        'BACKEND': 'djnago.contrib.staticfiles.storage.StaticFilesStorage'
+        'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'
     }
 }
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'

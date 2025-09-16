@@ -1,0 +1,6 @@
+todo_ninja/media/statistics/
+*_env
+*.pyc
+*.csv
+data/
+.*

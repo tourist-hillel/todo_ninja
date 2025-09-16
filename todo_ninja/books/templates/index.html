@@ -1,11 +1,7 @@
-<!DOCTYPE html>
-<html lang="uk">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Обробка файлів</title>
-        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    </head>
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
     <body>
         <h1>Test from local space</h1>
 
@@ -162,4 +158,4 @@
             // })
         </script>
     </body>
-</html>
+{% endblock %}

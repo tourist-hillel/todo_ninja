@@ -1,0 +1,31 @@
+Run started:2025-09-16 16:59:47.464430
+
+Test results:
+>> Issue: [B106:hardcoded_password_funcarg] Possible hardcoded password: 'password'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.6/plugins/b106_hardcoded_password_funcarg.html
+   Location: todo_ninja/lib_drf/tests/test_api.py:14:20
+13	        self.client = APIClient()
+14	        self.user = User.objects.create_user(email='test@mixins.com', password='password')
+15	        self.token = Token.objects.create(user=self.user)
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 568
+	Total lines skipped (#nosec): 0
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 1
+		Medium: 0
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 1
+		High: 0
+Files skipped (0):

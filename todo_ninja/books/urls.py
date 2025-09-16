@@ -7,7 +7,8 @@ from books.views import (
     delete_file,
     ListFilesUploadView,
     FileDetailView,
-    upload_files_s3
+    upload_files_s3,
+    s3_file_list,
 )
 
 urlpatterns = [
@@ -18,5 +19,5 @@ urlpatterns = [
     path('files_cbv/', ListFilesUploadView.as_view(), name='list_files_cbv'),
     path('file_cbv/<int:file_id>/', FileDetailView.as_view(), name='view_file_cbv'),
     path('upload_s3/', upload_files_s3, name='upload_file_s3'),
-    path('files-list/', TemplateView.as_view(template_name='files_list_s3.html'), name='files_s3')
+    path('files-list/', s3_file_list, name='files_s3')
 ]

@@ -1,13 +1,16 @@
 import os
+from botocore.exceptions import ClientError
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.shortcuts import redirect, render
 from django.views import View
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext_lazy as _
 from books.models import UploadedFiles
 from books.signals import file_word_count
 from books.redis_client import RedisClient
+from books.boto_client import get_s3_client, FILE_BUCKET_NAME
 
 
 def upload_file(request):
@@ -189,3 +192,46 @@ def upload_files_s3(request):
         file = request.FILES['file']
         default_storage.save(file.name, ContentFile(file.read()))
     return redirect('files_s3')
+
+
+def s3_file_list(request):
+    s3_client = get_s3_client()
+    files = []
+    continuation_token = None
+    errors_list = []
+
+    try:
+        while True:
+            params = {'Bucket': FILE_BUCKET_NAME}
+            if continuation_token:
+                params['ContinuationToken'] = continuation_token
+            
+            response = s3_client.list_objects_v2(**params)
+            for file in response.get('Contents', []):
+                file_name = file['Key']
+                try:
+                    file_params = params.copy()
+                    file_params['Key'] = file_name
+                    file_url = s3_client.generate_presigned_url(
+                        'get_object',
+                        Params=file_params,
+                        ExpiresIn=45
+                    )
+
+                    files.append({
+                        'file_name': file_name,
+                        'file_url': file_url,
+                        'size': file['Size'],
+                        'last_modified': file['LastModified']
+                    })
+                except ClientError as e:
+                    errors_list.append(e)
+            if response.get('IsTruncated'):
+                continuation_token = response.get('NextContinuationtoken')
+            else:
+                break
+    except ClientError as e:
+        errors_list.append(e)
+
+    user_greating = _('Hello user')
+    return render(request, 'files_list_s3.html', {'files': files, 'errors': errors_list, 'greatings': user_greating})

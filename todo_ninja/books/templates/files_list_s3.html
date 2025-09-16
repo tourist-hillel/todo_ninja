@@ -1,8 +1,48 @@
-<!DOCTYPE html>
-<html>
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+    <div>{{ greatings }}</div>
+    {% if errors %}
+        <div>
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="file" name="file">
-        <button type="submit" formaction="{% url 'upload_file_s3' %}">Upload</button>
+        <button type="submit" formaction="{% url 'upload_file_s3' %}">{% trans "Upload" %}</button>
     </form>
-</html>
+
+    <table>
+        <thead>
+            <tr>
+                <th>{% trans "File name" %}</th>
+                <th>{% trans "File size" %}</th>
+                <th>{% trans "Last modified" %}</th>
+                <th>{% trans "File actions" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for file in files %}
+                <tr>
+                    <td>
+                        <a href="{{ file.file_url }}" target="_blank">{{ file.file_name }}</a>
+                    </td>
+                    <td>{{ file.size }}</td>
+                    <td>{{ file.last_modified }}</td>
+                    <td>
+                        <a href="#">{% trans "Delete" %}</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <td>{% trans "No files" %}</td>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

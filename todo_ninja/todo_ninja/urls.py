@@ -23,6 +23,9 @@ from django.views.generic import TemplateView
 # from ninja import NinjaAPI
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from ws_chat.views import register
+from django.conf.urls.i18n import i18n_patterns
+from django.views.i18n import set_language
+from todo_ninja.debug_view import debug_session
 
 # from api.views import router as task_router
 
@@ -34,7 +37,6 @@ from ws_chat.views import register
 # )
 
 # api.add_router('task_api', task_router)
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     # path('api/', api.urls),
@@ -49,3 +51,8 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('register/', register, name='register'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+urlpatterns += [
+    path('i18n/', include('django.conf.urls.i18n')),
+    path('debug-session/', debug_session, name='debug_session'),
+]
