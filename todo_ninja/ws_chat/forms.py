@@ -1,5 +1,5 @@
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import get_user_model, password_validation
+from django.contrib.auth import get_user_model
 
 
 class ChatUserCreationForm(UserCreationForm):

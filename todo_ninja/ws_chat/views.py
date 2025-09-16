@@ -9,6 +9,7 @@ from ws_chat.forms import ChatUserCreationForm
 def index(request, room_name):
     return render(request, 'chat/index.html', {'room_name': room_name})
 
+
 def register(request):
     if request.method == 'POST':
         form = ChatUserCreationForm(request.POST)

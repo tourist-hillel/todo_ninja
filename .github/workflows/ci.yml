@@ -23,7 +23,7 @@ jobs:
                  python -m pip install --upgrade pip
                  pip install flake8
             - name: Run flake8
-              run: flake8 todo_ninja/lib_drf/ todo_ninja/users_app/ --exclude=migrations --max-line-length=120
+              run: flake8 todo_ninja/ws_chat --exclude=migrations --max-line-length=120
 
     test:
         runs-on: ubuntu-latest
@@ -53,7 +53,7 @@ jobs:
                 DJANGO_SETTINGS_MODULE: todo_ninja.settings
 
             - name: Run tests
-              run: python todo_ninja/manage.py tests lib_drf
+              run: python todo_ninja/manage.py test lib_drf
               env:
                 DJANGO_SETTINGS_MODULE: todo_ninja.settings
                 REDIS_HOST: redis

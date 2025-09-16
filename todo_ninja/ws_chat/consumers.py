@@ -13,7 +13,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
         await self.accept()
-    
+
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
             self.room_group_name,
@@ -23,12 +23,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json.get('message', '')
-        
+
         if not self.is_valid_message(message):
             await self.send(text_data=json.dumps({
                 'error': 'Invalid message'
             }))
-
 
         user = self.scope['user']
         await self.channel_layer.group_send(
